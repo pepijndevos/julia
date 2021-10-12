@@ -67,7 +67,7 @@ bool use_sret(jl_datatype_t *dt, LLVMContext &ctx) override
     return true;
 }
 
-bool needPassByRef(jl_datatype_t *dt, AttrBuilder &ab, LLVMContext &ctx) override
+bool needPassByRef(jl_datatype_t *dt, AttrBuilder &ab, LLVMContext &ctx, Type *Ty) override
 {
     size_t size = jl_datatype_size(dt);
     if (is_complex64(dt) || is_complex128(dt) || (jl_is_primitivetype(dt) && size <= 8))
@@ -75,7 +75,6 @@ bool needPassByRef(jl_datatype_t *dt, AttrBuilder &ab, LLVMContext &ctx) overrid
 #if JL_LLVM_VERSION < 120000
         ab.addAttribute(Attribute::ByVal);
 #else
-        Type* Ty = preferred_llvm_type(dt, false, ctx);
         ab.addByValAttr(Ty);
 #endif
     return true;

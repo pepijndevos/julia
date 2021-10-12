@@ -101,7 +101,7 @@ bool use_sret(jl_datatype_t *dt, LLVMContext &ctx) override
     return false;
 }
 
-bool needPassByRef(jl_datatype_t *dt, AttrBuilder &ab, LLVMContext &ctx) override
+bool needPassByRef(jl_datatype_t *dt, AttrBuilder &ab, LLVMContext &ctx, Type *Ty) override
 {
     jl_datatype_t *ty0 = NULL;
     bool hva = false;
@@ -109,7 +109,6 @@ bool needPassByRef(jl_datatype_t *dt, AttrBuilder &ab, LLVMContext &ctx) overrid
 #if JL_LLVM_VERSION < 120000
         ab.addAttribute(Attribute::ByVal);
 #else
-        Type* Ty = preferred_llvm_type(dt, false, ctx);
         ab.addByValAttr(Ty);
 #endif
         return true;
