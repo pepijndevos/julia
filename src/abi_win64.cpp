@@ -62,8 +62,14 @@ bool needPassByRef(jl_datatype_t *dt, AttrBuilder &ab, LLVMContext &ctx) overrid
     size_t size = jl_datatype_size(dt);
     if (win64_reg_size(size))
         return false;
-    if (nargs <= 4)
+    if (nargs <= 4) {
+#if JL_LLVM_VERSION < 120000
         ab.addAttribute(Attribute::ByVal);
+#else
+        Type* Ty = preferred_llvm_type(dt, false, ctx);
+        ab.addByValAttr(Ty);
+#endif
+    }
     return true;
 }
 

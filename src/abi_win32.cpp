@@ -53,7 +53,12 @@ bool needPassByRef(jl_datatype_t *dt, AttrBuilder &ab, LLVMContext &ctx) overrid
 {
     // Use pass by reference for all structs
     if (dt->layout->nfields > 0) {
+#if JL_LLVM_VERSION < 120000
         ab.addAttribute(Attribute::ByVal);
+#else
+        Type* Ty = preferred_llvm_type(dt, false, ctx);
+        ab.addByValAttr(Ty);
+#endif
         return true;
     }
     return false;
